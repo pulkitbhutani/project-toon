@@ -1,5 +1,5 @@
 import React from "react";
-import { ImSearch, ImBookmark, ImNotification } from "react-icons/im";
+import { ImSearch } from "react-icons/im";
 import "./Header.scss";
 
 function Header() {
