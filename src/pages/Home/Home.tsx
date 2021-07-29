@@ -13,7 +13,7 @@ function Home() {
       .then((data) => {
         let projectsArr: Project[] = [];
 
-        data.docs.map((doc) => {
+        data.docs.forEach((doc) => {
           projectsArr.push({ ...doc.data() });
         });
         console.log(projectsArr);
