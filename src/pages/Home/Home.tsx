@@ -1,10 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch,
+  useParams,
+} from "react-router-dom";
+import { atom, useRecoilState } from "recoil";
+
 import { Project } from "../../models/Project";
+import ProjectPage from "../Project/Project";
 import { firestore } from "../../firebase";
 
+import ProjectCard from "../../components/ProjectCard/ProjectCard";
+
+import "./Home.scss";
+
+const projectsState = atom<Project[]>({
+  key: "projects",
+  default: [],
+});
+
 function Home() {
-  const initialProjectsArr: Project[] = [];
-  const [projects, setProjects] = useState(initialProjectsArr);
+  let match = useRouteMatch();
+  const [projects, setProjects] = useRecoilState(projectsState);
 
   useEffect(() => {
     firestore
@@ -16,20 +36,34 @@ function Home() {
         data.docs.forEach((doc) => {
           projectsArr.push({ ...doc.data() });
         });
-        console.log(projectsArr);
+
         setProjects(projectsArr);
       });
   }, []);
 
   return (
-    <div>
-      <h2>Project Based Learning For Maths</h2>
-      <h3>Project List</h3>
+    <div className="home-container">
+      <h1>Projects</h1>
+      <div className="projects-container">
+        {projects &&
+          projects.map((item: Project, index: number) => {
+            const prop = {
+              title: item.name,
+              description: item.description,
+            };
 
-      {projects &&
-        projects.map((item, index) => {
-          return <p key={index}>{item.name}</p>;
-        })}
+            return (
+              <Link to={`${match.url}/project/${item.uid}`}>
+                <ProjectCard key={index} {...prop} />
+              </Link>
+            );
+          })}
+      </div>
+      <Switch>
+        <Route path={`${match.path}/project/:projectId`}>
+          <ProjectPage />
+        </Route>
+      </Switch>
     </div>
   );
 }
